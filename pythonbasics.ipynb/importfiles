@@ -1,0 +1,22 @@
+# Hücre 1 — kütüphaneler
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+# Hücre 2 — NumPy: 0–20 derece arası açılar ve Cl tahmini
+aci_derece = np.arange(0, 21, 1)          # 0, 1, 2, ..., 20
+aci_radyan = np.deg2rad(aci_derece)
+cl = 2 * np.pi * aci_radyan               # döngü yok: işlem tüm diziye birden uygulanır
+print(cl)
+# Hücre 3 — pandas: tabloya çevir, CSV olarak kaydet, geri oku
+tablo = pd.DataFrame({"aci_derece": aci_derece, "cl_teori": cl})
+tablo.to_csv("ince_kanat.csv", index=False)
+
+okunan = pd.read_csv("ince_kanat.csv")
+okunan.head()
+# Hücre 4 — Matplotlib: grafik
+plt.plot(okunan["aci_derece"], okunan["cl_teori"], marker="o")
+plt.xlabel("Hücum açısı (derece)")
+plt.ylabel("Cl")
+plt.title("İnce kanat teorisi: Cl ≈ 2πα")
+plt.grid(True)
+plt.show()
