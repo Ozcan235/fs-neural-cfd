@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "pytorch-lightning": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pytorch-lightning/SKILL.md",
+      "computedHash": "16776c2d267e8d3bebf8dbc901856b9b34ee686337f07545e379823471c2d714"
+    },
+    "scikit-learn": {
+      "source": "K-Dense-AI/scientific-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/scikit-learn/SKILL.md",
+      "computedHash": "2a42b7dde89706e721174ed83fb93c2253cf33843f798b4d4c2bf22e9fa86801"
+    }
+  }
+}
