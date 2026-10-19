@@ -25,7 +25,7 @@ RE_SOLVE = re.compile(r"Solving for (\w+), Initial residual = ([\deE.+-]+|nan|-?
 
 def parse_log(text: str) -> dict:
     """Her iterasyon için ilk initial residual'ı toplar."""
-    iters, res = [], {f: [] for f in FIELDS}
+    iters, res, bounding = [], {f: [] for f in FIELDS}, []
     blocks = RE_TIME.split(text)
     # blocks: [önsöz, t1, blok1, t2, blok2, ...]
     for t, block in zip(blocks[1::2], blocks[2::2]):
@@ -33,19 +33,22 @@ def parse_log(text: str) -> dict:
         for f, v in RE_SOLVE.findall(block):
             if f in res and f not in seen:
                 seen[f] = float(v)
+        bounding.append(re.findall(r"bounding (\w+), min:", block))
         if seen:
             iters.append(float(t))
             for f in FIELDS:
                 res[f].append(seen.get(f))
-    bounding = re.findall(r"bounding (\w+), min: ([\deE.+-]+)", text)
+    # İlk iterasyonlardaki bounding normaldir; yalnızca çözümün ikinci yarısındakiler sayılır
+    late = [f for b in bounding[len(bounding) // 2:] for f in b]
     cont = re.findall(r"time step continuity errors : sum local = ([\deE.+-]+)", text)
     return {
         "iters": iters,
         "res": res,
-        "bounding_count": len(bounding),
-        "bounding_fields": sorted({b[0] for b in bounding}),
+        "bounding_count": len(late),
+        "bounding_fields": sorted(set(late)),
         "last_continuity": float(cont[-1]) if cont else None,
-        "fpe": bool(re.search(r"Floating point exception|sigFpe|FOAM FATAL", text)),
+        # Açılıştaki "Floating point exception trapping enabled" satırı çökme değildir
+        "fpe": bool(re.search(r"Floating point exception(?! trapping)|printStack|FOAM FATAL", text)),
         "fatal_msg": (re.search(r"(--> FOAM FATAL.*?)(?:\n\n|\Z)", text, re.S) or [None, None])[1],
         "converged_msg": "reached convergence criteria" in text or "SIMPLE solution converged" in text,
         "ended": bool(re.search(r"^End\s*$", text, re.M)),
@@ -97,7 +100,7 @@ def diagnose(log: dict, stab: dict, mesh_q: dict | None, end_time: int, robust: 
 
     if log["bounding_count"]:
         reasons.append(f"{log['bounding_count']} kez 'bounding' uyarısı ({', '.join(log['bounding_fields'])}): "
-                       "türbülans alanları negatif oluyor; düşük kaliteli hücre veya kararsızlık belirtisi.")
+                       "çözümün ikinci yarısında türbülans alanları negatif oluyor; düşük kaliteli hücre veya kararsızlık belirtisi.")
     if log["last_continuity"] and log["last_continuity"] > 1e-3:
         reasons.append(f"Süreklilik hatası yüksek ({log['last_continuity']:.2e}).")
 
