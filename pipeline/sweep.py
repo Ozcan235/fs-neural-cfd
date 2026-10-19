@@ -6,6 +6,8 @@ Kullanım örnekleri:
     # Quasi-random örnekleme (aralıklar config.PARAM_RANGES'tan, --aoa 0:12 ile değiştirilebilir)
     python -m pipeline.sweep sobol --n 64 --seed 0
     python -m pipeline.sweep lhs --n 100 --seed 1 --np 6
+    # Surrogate eğitimi için önerilen: 32 (h, flap) konfigürasyonu x 7 AoA (grup bazlı bölme için)
+    python -m pipeline.sweep sobol --n 32 --aoa-values 0:12:7
     # Sadece planı göster
     python -m pipeline.sweep sobol --n 16 --dry-run
 
@@ -52,11 +54,16 @@ def make_plan(args) -> list[dict]:
         pts = list(itertools.product(*axes))
     else:
         from scipy.stats import qmc
-        sampler = (qmc.Sobol(d=3, scramble=True, seed=args.seed) if args.method == "sobol"
-                   else qmc.LatinHypercube(d=3, seed=args.seed))
+        # --aoa-values verilirse yalnızca (h, flap) konfigürasyonları örneklenir, her biri AoA listesiyle taranır
+        sampled = ("h", "flap") if args.aoa_values else names
+        d = len(sampled)
+        sampler = (qmc.Sobol(d=d, scramble=True, seed=args.seed) if args.method == "sobol"
+                   else qmc.LatinHypercube(d=d, seed=args.seed))
         unit = sampler.random(args.n)
-        lo, hi = zip(*(parse_range(getattr(args, n), n) for n in names))
+        lo, hi = zip(*(parse_range(getattr(args, n), n) for n in sampled))
         pts = qmc.scale(unit, lo, hi).tolist()
+        if args.aoa_values:
+            pts = [(a, h, f) for h, f in pts for a in parse_axis(args.aoa_values)]
     plan, seen = [], set()
     for p in pts:
         d = {n: round(v, ROUND[n]) for n, v in zip(names, p)}
@@ -128,6 +135,8 @@ def main(argv=None) -> int:
     ap.add_argument("--h")
     ap.add_argument("--flap")
     ap.add_argument("--n", type=int, default=32, help="sobol/lhs örnek sayısı (sobol için 2'nin kuvveti önerilir)")
+    ap.add_argument("--aoa-values", help="sobol/lhs: (h, flap) konfigürasyonlarını örnekle, her birini bu AoA "
+                                         "listesiyle tara ('0:12:7' veya '0,4,8'). --n konfigürasyon sayısı olur")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--np", type=int, default=config.N_PROCS)
     ap.add_argument("--end-time", type=int, default=config.END_TIME)

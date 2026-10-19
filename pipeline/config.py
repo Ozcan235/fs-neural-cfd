@@ -58,3 +58,9 @@ AVG_LAST_N = 300
 def case_id(aoa: float, h: float, flap: float) -> str:
     """Parametrelerden deterministik klasör adı üretir."""
     return f"a{aoa:+06.2f}_h{h:.3f}_f{flap:+06.2f}".replace("+", "p").replace("-", "m")
+
+
+def geometry_id(h: float, flap: float) -> str:
+    """Konfigürasyon kimliği (h/c + flap). Aynı konfigürasyonun farklı AoA'ları aynı gruptadır;
+    surrogate eğitiminde train/test ayrımı bu kimliğe göre yapılır."""
+    return f"h{h:.3f}_f{flap:+06.2f}".replace("+", "p").replace("-", "m")

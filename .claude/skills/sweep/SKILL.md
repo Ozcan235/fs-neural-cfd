@@ -1,7 +1,7 @@
 ---
 name: sweep
 description: OpenCFD veri seti üretimi — bir parametre ızgarasını (grid) veya Sobol/LHS örneklemesini döngüyle mesh-wing → setup-case → run-and-check → extract-coeffs adımlarından geçirir, kaldığı yerden devam eder ve sonuçları data/dataset.csv'ye yazar. Kullanıcı açıkça /sweep çağırdığında kullan.
-argument-hint: "grid aoa=0:12:4 h=0.1,0.2,0.3 flap=10:30:3 | sobol n=64 seed=0 | lhs n=100 [np=6] [dry-run]"
+argument-hint: "grid aoa=0:12:4 h=0.1,0.2,0.3 flap=10:30:3 | sobol n=32 aoa-values=0:12:7 | lhs n=100 [np=6] [dry-run]"
 disable-model-invocation: true
 ---
 
@@ -25,6 +25,7 @@ Argümanlar: `$ARGUMENTS`
    - Yöntem: `grid`, `sobol` veya `lhs` (verilmezse sor; veri seti için README Sobol/LHS önerir).
    - grid ekseni: `a:b:n` (n eşit aralıklı nokta) veya virgüllü liste. Verilmeyen eksen `config.PARAM_RANGES` aralığında 3 noktadır.
    - sobol/lhs: `--n`, `--seed`; aralıklar `--aoa 0:12` biçiminde daraltılabilir. Sobol için n'in 2'nin kuvveti olması önerilir.
+   - **Surrogate eğitimi için veri üretiliyorsa `--aoa-values` kullan** (ör. `sobol --n 32 --aoa-values 0:12:7`): (h, flap) konfigürasyonları örneklenir, her biri aynı AoA listesiyle taranır. `/train-surrogate` train/test ayrımını `geometry_id` (= h + flap) grubuna göre yapar; `--aoa-values` olmadan her konfigürasyonda tek case olur ve grup bazlı bölme anlamını yitirir. Bu durumda kullanıcıyı uyar.
    - Diğer: `--np`, `--end-time`, `--last`, `--csv`, `--set gap=0.025` (tüm case'lerin geometrisi), `--max-cases`, `--cleanup`.
 2. **Önce her zaman dry-run** çalıştır ve planı kullanıcıya göster:
    ```

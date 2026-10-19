@@ -16,7 +16,7 @@ Argümanlar: `$ARGUMENTS`
 - `params.json`, `case_setup.json`, `run_status.json`, `mesh_quality.json` dosyalarından meta veriyi ekler
 - CSV'ye yazar; aynı `case_id` varsa satırı **günceller** (yinelenen satır olmaz)
 
-CSV sütunları: `case_id, aoa_deg, h_over_c, flap_deg, cl, cd, cl_std, cd_std, l_over_d, n_avg, iterations, status, cells, u_inf, re_c, timestamp`
+CSV sütunları: `case_id, geometry_id, aoa_deg, h_over_c, flap_deg, cl, cd, cl_std, cd_std, l_over_d, n_avg, iterations, status, cells, u_inf, re_c, timestamp`
 
 ## Adımlar
 
@@ -33,5 +33,6 @@ CSV sütunları: `case_id, aoa_deg, h_over_c, flap_deg, cl, cd, cl_std, cd_std, 
 
 ## Notlar
 
+- `geometry_id` = h/c + flap açısı konfigürasyonu (`config.geometry_id`). `/train-surrogate` bu sütuna göre grup bazlı bölme yapar.
 - Cl < 0 = bastırma kuvveti (liftDir = +y). Veri setinde işaret değiştirilmez.
 - Katsayılar 2D (birim açıklık başına): Aref = c · span, lRef = c.

@@ -16,7 +16,7 @@ from pathlib import Path
 
 from . import config
 
-COLUMNS = ["case_id", "aoa_deg", "h_over_c", "flap_deg", "cl", "cd", "cl_std", "cd_std", "l_over_d",
+COLUMNS = ["case_id", "geometry_id", "aoa_deg", "h_over_c", "flap_deg", "cl", "cd", "cl_std", "cd_std", "l_over_d",
            "n_avg", "iterations", "status", "cells", "u_inf", "re_c", "timestamp"]
 
 
@@ -79,6 +79,7 @@ def build_row(case_dir: Path, last: int) -> dict:
     u = float(setup.get("U_INF", config.U_INF))
     return {
         "case_id": case_dir.name,
+        "geometry_id": config.geometry_id(params["h"], params["flap"]),
         "aoa_deg": params["aoa"], "h_over_c": params["h"], "flap_deg": params["flap"],
         "cl": f"{s['cl']:.6f}", "cd": f"{s['cd']:.6f}",
         "cl_std": f"{s['cl_std']:.2e}", "cd_std": f"{s['cd_std']:.2e}",

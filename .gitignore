@@ -2,3 +2,9 @@
 __pycache__/
 .ipynb_checkpoints/
 runs/
+tmp_test/
+# Büyük ikili dosyalar (mesh, model ağırlıkları); normalde runs/ altında oluşur
+*.msh
+*.ckpt
+*.pt
+*.joblib
