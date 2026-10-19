@@ -1,0 +1,47 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  OpenCFD şablon case — @@...@@ yer tutucuları pipeline/setup_case.py doldurur
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (@@U_INF@@ 0 0);
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform (@@U_INF@@ 0 0);
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform (0 0 0);
+        value           $internalField;
+    }
+    top
+    {
+        type            slip;
+    }
+    ground
+    {
+        // Hareketli zemin: zemin serbest akış hızıyla kayar
+        type            fixedValue;
+        value           uniform (@@U_INF@@ 0 0);
+    }
+    "wing_.*"
+    {
+        type            noSlip;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+}

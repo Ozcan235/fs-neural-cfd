@@ -1,0 +1,72 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  OpenCFD şablon case — @@...@@ yer tutucuları pipeline/setup_case.py doldurur
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+
+application     simpleFoam;
+
+startFrom       latestTime;
+startTime       0;
+stopAt          endTime;
+endTime         @@END_TIME@@;
+deltaT          1;
+
+writeControl    timeStep;
+writeInterval   @@WRITE_INTERVAL@@;
+purgeWrite      2;
+
+writeFormat     binary;
+writePrecision  8;
+writeCompression off;
+timeFormat      general;
+timePrecision   6;
+runTimeModifiable true;
+
+functions
+{
+    forceCoeffs1
+    {
+        type            forceCoeffs;
+        libs            (forces);
+        writeControl    timeStep;
+        writeInterval   1;
+        log             false;
+
+        patches         (@@PATCHES@@);
+        rho             rhoInf;
+        rhoInf          @@RHO_INF@@;
+
+        magUInf         @@U_INF@@;
+        lRef            @@L_REF@@;
+        Aref            @@A_REF@@;
+
+        // Akış +x yönünde; hücum açısı geometride. Cl < 0 = bastırma kuvveti
+        liftDir         (0 1 0);
+        dragDir         (1 0 0);
+        CofR            (@@COFR_X@@ 0 0);
+        pitchAxis       (0 0 1);
+    }
+
+    solverInfo1
+    {
+        type            solverInfo;
+        libs            (utilityFunctionObjects);
+        fields          (U p k omega);
+        writeResidualFields no;
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+
+    yPlus1
+    {
+        type            yPlus;
+        libs            (fieldFunctionObjects);
+        writeControl    writeTime;
+    }
+}

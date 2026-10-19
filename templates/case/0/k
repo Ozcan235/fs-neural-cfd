@@ -1,0 +1,42 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  OpenCFD şablon case — @@...@@ yer tutucuları pipeline/setup_case.py doldurur
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      k;
+}
+
+dimensions      [0 2 -2 0 0 0 0];
+
+internalField   uniform @@K_INF@@;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform @@K_INF@@;
+    }
+    outlet
+    {
+        type            inletOutlet;
+        inletValue      uniform @@K_INF@@;
+        value           $internalField;
+    }
+    top
+    {
+        type            slip;
+    }
+    "(ground|wing_.*)"
+    {
+        type            kqRWallFunction;
+        value           uniform @@K_INF@@;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
+}

@@ -1,0 +1,14 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  OpenCFD şablon case — @@...@@ yer tutucuları pipeline/setup_case.py doldurur
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+
+transportModel  Newtonian;
+
+nu              @@NU@@;
